@@ -7,7 +7,12 @@
 --
 -- Escriba el resultado a la carpeta `output` de directorio de trabajo.
 --
+
+!hdfs dfs -rm -r -f /output;
 DROP TABLE IF EXISTS tbl0;
+DROP TABLE IF EXISTS tbl1;
+drop table if exists datos_final;
+
 CREATE TABLE tbl0 (
     c1 INT,
     c2 STRING,
@@ -23,7 +28,7 @@ MAP KEYS TERMINATED BY '#'
 LINES TERMINATED BY '\n';
 LOAD DATA LOCAL INPATH 'tbl0.csv' INTO TABLE tbl0;
 --
-DROP TABLE IF EXISTS tbl1;
+
 CREATE TABLE tbl1 (
     c1 INT,
     c2 INT,
@@ -41,3 +46,18 @@ LOAD DATA LOCAL INPATH 'tbl1.csv' INTO TABLE tbl1;
 --
 
 
+
+
+CREATE TABLE datos_final
+AS
+    select
+    c2, concat_ws(':',COLLECT_LIST(cast(c1 as STRING))) c1
+    from tbl0
+    group by c2
+;
+
+INSERT OVERWRITE DIRECTORY '/output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+    SELECT * FROM datos_final;
+
+!hdfs dfs -copyToLocal /output output ;

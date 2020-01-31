@@ -28,13 +28,20 @@
 -- 
 fs -rm -f -r output;
 --
-u = LOAD 'data.csv' USING PigStorage(',') 
-    AS (id:int, 
-        firstname:CHARARRAY, 
-        surname:CHARARRAY, 
-        birthday:CHARARRAY, 
-        color:CHARARRAY, 
-        quantity:INT);
+datos = LOAD 'data.csv' USING PigStorage(',') 
+    AS (id:INT, 
+        nombre:CHARARRAY,
+        apellido:CHARARRAY,
+        fecha:CHARARRAY,
+        color:CHARARRAY,
+        numero: int
+        );
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+
+lista_apellidos = foreach datos generate UCFIRST(apellido),UPPER(apellido),LOWER(apellido);
+
+lista_ordenada = ORDER lista_apellidos BY $0;
+
+store lista_ordenada into 'output' USING PigStorage(',');

@@ -30,13 +30,34 @@
 -- 
 fs -rm -f -r output;
 -- 
-u = LOAD 'data.csv' USING PigStorage(',') 
+data = LOAD 'data.csv' USING PigStorage(',') 
     AS (id:int, 
         firstname:CHARARRAY, 
         surname:CHARARRAY, 
         birthday:CHARARRAY, 
         color:CHARARRAY, 
         quantity:INT);
---
--- >>> Escriba su respuesta a partir de este punto <<<
---
+
+datos = FOREACH data GENERATE birthday as fecha, SUBSTRING(birthday,5,7) as mes_largo,(int) SUBSTRING(birthday,5,7) as mes_corto;
+
+datos_final = foreach datos generate fecha,
+				case mes_largo
+				when '01'  then 'ene'
+				when '02'  then 'feb'
+				when '03'  then 'mar'
+				when '04'  then 'abr'
+				when '05'  then 'may'
+				when '06'  then 'jun'
+				when '07'  then 'jul'
+				when '08'  then 'ago'
+				when '09'  then 'sep'
+				when '10'  then 'oct'
+				when '11'  then 'nov'
+				when '12'  then 'dic'
+				end as nom_mes,
+				mes_largo,
+				mes_corto;
+
+
+
+store datos_final into 'output' USING PigStorage(',');

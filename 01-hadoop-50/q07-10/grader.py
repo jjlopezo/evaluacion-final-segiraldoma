@@ -1,4 +1,3 @@
-
 #! /usr/local/bin/python3
 r"""Test cases
 >>> run_answer() # doctest: +NORMALIZE_WHITESPACE
@@ -36,14 +35,13 @@ E   1993-01-27   9
 E   1994-02-14   10	
 E   1999-09-10   11	
 E   1999-12-06   12	
-E   1991-02-18   141
 E   1999-01-14   15	
 E   1990-05-03   16	
 E   1985-02-12   17	
 E   1990-02-09   18	
 E   1993-12-27   19	
+E   1991-02-18   141
 <BLANKLINE>
-
 """
 import doctest
 import subprocess

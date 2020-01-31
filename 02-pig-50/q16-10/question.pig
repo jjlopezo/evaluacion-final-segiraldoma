@@ -24,6 +24,9 @@ u = LOAD 'data.csv' USING PigStorage(',')
         birthday:CHARARRAY, 
         color:CHARARRAY, 
         quantity:INT);
---
--- >>> Escriba su respuesta a partir de este punto <<<
---
+
+datos = FOREACH u GENERATE firstname,color;
+
+filtro = FILTER datos BY color == 'blue' or STARTSWITH(firstname,'K');
+
+store filtro into 'output' USING PigStorage(',');

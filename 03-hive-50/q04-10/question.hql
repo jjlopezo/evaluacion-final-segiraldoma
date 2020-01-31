@@ -7,6 +7,7 @@
 --
 -- Escriba el resultado a la carpeta `output` de directorio de trabajo.
 --
+
 DROP TABLE IF EXISTS tbl0;
 CREATE TABLE tbl0 (
     c1 INT,
@@ -21,6 +22,7 @@ FIELDS TERMINATED BY ','
 COLLECTION ITEMS TERMINATED BY ':'
 MAP KEYS TERMINATED BY '#'
 LINES TERMINATED BY '\n';
+
 LOAD DATA LOCAL INPATH 'tbl0.csv' INTO TABLE tbl0;
 --
 DROP TABLE IF EXISTS tbl1;
@@ -35,8 +37,29 @@ FIELDS TERMINATED BY ','
 COLLECTION ITEMS TERMINATED BY ':'
 MAP KEYS TERMINATED BY '#'
 LINES TERMINATED BY '\n';
+
 LOAD DATA LOCAL INPATH 'tbl1.csv' INTO TABLE tbl1;
 --
 -- >>> Escriba su respuesta a partir de este punto <<<
 --
+
+DROP TABLE IF EXISTS datos_final;
+
+
+CREATE TABLE datos_final
+AS
+    SELECT DISTINCT c5 FROM (
+
+        SELECT c5 FROM tbl0 lateral view explode(c5) tbl0 as c5
+
+    ) t0 order by c5;
+
+
+!hdfs dfs -rm -r -f '/output' ;
+
+INSERT OVERWRITE DIRECTORY '/output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+    SELECT * FROM datos_final;
+
+!hdfs dfs -copyToLocal /output output ;
 

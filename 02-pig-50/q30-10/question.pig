@@ -30,14 +30,49 @@
 -- 
 fs -rm -f -r output;
 --
-u = LOAD 'data.csv' USING PigStorage(',') 
+data = LOAD 'data.csv' USING PigStorage(',') 
     AS (id:int, 
         firstname:CHARARRAY, 
         surname:CHARARRAY, 
         birthday:CHARARRAY, 
         color:CHARARRAY, 
         quantity:INT);
---
--- >>> Escriba su respuesta a partir de este punto <<<
---
 
+
+fecha = FOREACH data GENERATE birthday as fecha, ToDate(birthday,'yyyy-MM-dd') AS fecha_f;
+
+fecha_formato = FOREACH fecha GENERATE fecha
+				, SUBSTRING($0,8,10) AS num_dia_largo
+				, GetDay(fecha_f) as num_dia
+				, ToString(ToDate(fecha,'yyyy-MM-dd'), 'EEE') AS fecha_f_corto
+				, ToString(ToDate(fecha,'yyyy-MM-dd'), 'EEEE') AS fecha_f_largo
+				;
+
+
+
+datos_final = FOREACH fecha_formato GENERATE fecha
+				, num_dia_largo
+				, num_dia
+				, case fecha_f_corto
+					when 'Mon' then 'lun'
+					when 'Tue' then 'mar'
+					when 'Wed' then 'mie'
+					when 'Thu' then 'jue'
+					when 'Fri' then 'vie'
+					when 'Sat' then 'sab'
+					when 'Sun' then 'dom'
+					end as nom_dia_corto
+
+				, case fecha_f_corto
+					when 'Mon' then 'lunes'
+					when 'Tue' then 'martes'
+					when 'Wed' then 'miercoles'
+					when 'Thu' then 'jueves'
+					when 'Fri' then 'viernes'
+					when 'Sat' then 'sabado'
+					when 'Sun' then 'domingo'
+					end as nom_dia_largo;
+
+
+
+store datos_final into 'output' USING PigStorage(',');
